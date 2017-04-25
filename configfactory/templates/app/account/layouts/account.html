@@ -1,0 +1,20 @@
+{% extends 'app/layouts/main.html' %}
+{% load static menu_tags %}
+
+{% block content_wrapper %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="nav-tabs-custom">
+                {% account_tabs request %}
+{#                <ul class="nav nav-tabs">#}
+{#                    <li class="active"><a href="#activity" data-toggle="tab" aria-expanded="true">Activity</a></li>#}
+{#                    <li class=""><a href="#timeline" data-toggle="tab" aria-expanded="false">Timeline</a></li>#}
+{#                    <li class=""><a href="#settings" data-toggle="tab" aria-expanded="false">Settings</a></li>#}
+{#                </ul>#}
+                <div class="tab-content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

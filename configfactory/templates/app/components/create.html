@@ -1,0 +1,30 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n form_tags %}
+
+{% block title %}{% trans 'Create Component' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'components' %}">{% trans 'Components' %}</a></li>
+    <li class="active">{% trans 'Create' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <form role="form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.name %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.alias %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_global %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.use_schema %}
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

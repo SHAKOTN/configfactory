@@ -1,0 +1,27 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags %}
+
+{% block title %}{% trans 'Delete' %} <strong>{{ object }}</strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'users' %}">{% trans 'Users' %}</a></li>
+    <li><a href="{% url 'update_user' pk=object.pk %}">{{ object }}</a></li>
+    <li class="active">{% trans 'Delete' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-danger">
+        <form method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% blocktrans with name=object %}
+                    <p>Are you sure you want to delete <strong>{{ name }}</strong> ?</p>
+                {% endblocktrans %}
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-danger">{% trans 'Yes, delete' %}</button>
+                {% back_btn request 'users' %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

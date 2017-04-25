@@ -1,0 +1,109 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags %}
+
+{% block title %}Logs{% endblock %}
+
+{% block breadcrumbs %}
+    <li>
+        <a href="{% url 'logs' %}">{% trans 'Logs' %}</a>
+    </li>
+    <li class="active">{% trans 'Details' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">{% action_icon object.action %}&nbsp;&nbsp;{{ object }} <small class="text-muted">{{ object.action_time|timesince }} {% trans 'ago' %}</small></h3>
+        </div>
+        <div class="box-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th style="width: 160px">{% trans 'Action' %}</th>
+                        <td>{{ object.action }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'Action time' %}</th>
+                        <td>{{ object.action_time|date }} {{ object.action_time|time }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'User' %}</th>
+                        <td>{{ object.user.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'Content type' %}</th>
+                        <td>{{ object.content_type|capfirst }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'Object' %}</th>
+                        <td>
+                            {% if object.object_repr %}
+                                {% with object.get_object_url as object_url %}
+                                    {% if object_url %}
+                                        <a href="{{ object_url }}?next={{ request.path }}">{{ object.object_repr }}</a>
+                                    {% else %}
+                                        {{ object.object_repr }}
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'Object id' %}</th>
+                        <td>{{ object.object_id }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans 'Difference' %}</th>
+                        <td>
+                            <table class="table table-condensed no-border" style="width: 50%">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>{% trans 'Key' %}</th>
+                                        <th>{% trans 'Previous value' %}</th>
+                                        <th>{% trans 'Current value' %}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for action, field, detail in object.diff_data %}
+                                    {% if action == 'add' %}
+                                        {% for key, value in detail %}
+                                            <tr>
+                                                <td class="text-green"><i class="fa fa-plus-circle"></i></td>
+                                                <td>{% if field %}{{ field }}.{{ key }}{% else %}{{ key }}{% endif %}</td>
+                                                <td></td>
+                                                <td>{{ value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% elif action == 'change' %}
+                                        <tr>
+                                            <td class="text-blue"><i class="fa fa-pencil"></i></td>
+                                            <td>{{ field }}</td>
+                                            <td class="text-muted">
+                                                {{ detail|first }}
+                                            </td>
+                                            <td>
+                                                {{ detail|last }}
+                                            </td>
+                                        </tr>
+                                    {% elif action == 'remove' %}
+                                        {% for key, value in detail %}
+                                            <tr>
+                                                <td class="text-red"><i class="fa fa-minus-circle"></i></td>
+                                                <td>{% if field %}{{ field }}.{{ key }}{% else %}{{ key }}{% endif %}</td>
+                                                <td class="text-muted">{{ value }}</td>
+                                                <td></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

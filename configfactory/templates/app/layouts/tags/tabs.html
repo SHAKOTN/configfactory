@@ -1,0 +1,9 @@
+{% if items %}
+    <ul class="nav nav-tabs">
+        {% for item in items %}
+            <li class="{% if item.active %}active{% endif %}">
+                <a href="{% if item.active %}#{% else %}{{ item.url }}{% endif %}">{{ item.title|upper }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

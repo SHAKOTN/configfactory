@@ -1,0 +1,17 @@
+{% load form_tags %}
+
+<div class="form-group {% if field.errors %}has-error{% endif %} {{ class }} {% if span_class %}has-feedback{% endif %}">
+    <label class="col-sm-2 control-label" for="{{ field.auto_id }}">
+        {{ field.label }}
+        {% if field.field.required %}<span class="required" aria-required="true">* </span>{% endif %}
+    </label>
+    <div class="col-sm-6">
+        {{ field|addclass:'form-control' }}
+        {% if span_class %}
+            <span class="{{ span_class }} form-control-feedback"></span>
+        {% endif %}
+        {% include 'app/layouts/forms/_help_block.html' with field=field %}
+        {% include 'app/layouts/forms/_error_block.html' with field=field %}
+    </div>
+</div>
+

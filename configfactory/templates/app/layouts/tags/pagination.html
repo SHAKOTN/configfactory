@@ -1,0 +1,35 @@
+{% load i18n %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+    <div {% if pid %}id="{{ pid }}"{% endif %} class="paginator {% if float_pos %}pull-{{ float_pos }}{% endif %}">
+        <ul class="pagination pagination-{{ size|default_if_none:'sm' }} inline">
+            {% ifnotequal page_obj.number 1 %}
+                <li>
+                    <a href="?page=1" class="prev">&lsaquo;&lsaquo;</a>
+                </li>
+            {% endifnotequal %}
+            {% if page_obj.has_previous %}
+                <li>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="prev">&lsaquo;</a>
+                </li>
+            {% endif %}
+            {% for page in page_obj.paginator.page_range %}
+                {% ifequal page page_obj.number %}
+                    <li class="active"><a href="javascript:;" class="disabled">{{ page }}</a></li>
+                {% else %}
+                    <li><a href="?page={{ page }}">{{ page }}</a></li>
+                {% endifequal %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li>
+                    <a href="?page={{ page_obj.next_page_number }}" class="next">&rsaquo;</a>
+                </li>
+            {% endif %}
+            {% ifnotequal page_obj.number page_obj.paginator.num_pages %}
+                <li>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="prev">&rsaquo;&rsaquo;</a>
+                </li>
+            {% endifnotequal %}
+        </ul>
+    </div>
+{% endif %}

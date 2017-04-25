@@ -1,0 +1,27 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags %}
+
+{% block title %}{% trans 'Delete' %} <strong>{{ object.name }} <span class="small">{{ object.alias }}</span></strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'environments' %}">{% trans 'Environments' %}</a></li>
+    <li><a href="{% url 'update_environment' pk=object.pk %}">{{ object.name }}</a></li>
+    <li class="active">{% trans 'Delete' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-danger">
+        <form method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% blocktrans with name=object.name %}
+                    <p>Are you sure you want to delete <strong>{{ name }}</strong> environment ?</p>
+                {% endblocktrans %}
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-danger">{% trans 'Yes, delete' %}</button>
+                {% back_btn request 'environments' %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

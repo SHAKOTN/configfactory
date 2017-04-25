@@ -1,0 +1,4 @@
+{% load i18n %}
+{% if next_url or default_url %}
+    <a href="{{ next_url|default_if_none:default_url }}" class="btn btn-default">{% trans 'Back' %}</a>
+{% endif %}

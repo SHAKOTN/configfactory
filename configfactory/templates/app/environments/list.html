@@ -1,0 +1,73 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n perms_tags %}
+
+{% block title %}{% trans 'Environments' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">{% trans 'Environments' %}</li>
+{% endblock %}
+
+{% block content %}
+
+    <div class="box">
+        {% if user.is_staff %}
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <a href="{% url 'create_environment' %}" class="btn btn-sm btn-success pull-right">
+                        <i class="fa fa-plus"></i> {% trans 'ADD ENVIRONMENT' %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div class="box-body table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Name' %}</th>
+                        <th>{% trans 'Alias' %}</th>
+                        <th>{% trans 'Order' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for environment in environments %}
+
+                    <tr>
+                        <td>{{ environment.name }}</td>
+                        <td>{{ environment.alias }}</td>
+                        <td>{{ environment.order }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm pull-right">
+                                {% if user.is_superuser %}
+                                    <a href="" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Duplicate' %}">
+                                        <i class="fa fa-copy"></i>
+                                    </a>
+                                {% endif %}
+                                {% object_has_perm environments_perms environment 'change_environment' as can_change %}
+                                {% if can_change %}
+                                    <a href="{% url 'update_environment' pk=environment.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Edit' %}">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                {% endif %}
+                                {% object_has_perm environments_perms environment 'delete_environment' as can_delete %}
+                                {% if can_delete %}
+                                    <a href="{% url 'delete_environment' pk=environment.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Delete' %}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">
+                            <p class="text-center">{% trans 'No environments found.' %}</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

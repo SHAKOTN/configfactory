@@ -1,0 +1,30 @@
+{% extends 'app/layouts/main.html' %}
+{% load form_tags i18n ui_tags %}
+
+{% block title %}{% trans 'Edit' %} <strong>{{ object.name }} <span class="small">{{ object.alias }}</span></strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'environments' %}">{% trans 'Environments' %}</a></li>
+    <li class="active">{{ object.name }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <form role="form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.name %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.alias %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.order %}
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                        {% back_btn request 'environments' %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

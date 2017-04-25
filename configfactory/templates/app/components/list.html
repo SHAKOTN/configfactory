@@ -1,0 +1,115 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags perms_tags guardian_tags %}
+
+{% block page_js %}
+    {{ block.super }}
+    <script>
+        $(document).ready(function () {
+            $('.toggle-star').click(function (e) {
+                e.preventDefault();
+                var $self = $(this);
+                $.post($self.attr('href'), function (response) {
+                    if (response.toggled) {
+                        var status = response.status;
+                        if (status) {
+                            $self.attr('href', $self.attr('data-url-remove'));
+                            $self.find('i').removeClass('text-gray');
+                            $self.find('i').addClass('text-yellow');
+                        }
+                        else {
+                            $self.attr('href', $self.attr('data-url-add'));
+                            $self.find('i').removeClass('text-yellow');
+                            $self.find('i').addClass('text-gray');
+                        }
+                        $self.tooltip('hide');
+                    }
+                });
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block title %}{% trans 'Components' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">{% trans 'Components' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title"></h3>
+            <div class="box-tools">
+                <form action="">
+                    <div class="input-group input-group-sm" style="width: 260px;">
+                        <input type="text" name="search" class="form-control pull-right" placeholder="{% trans 'Search...' %}" value="{{ components_search|default_if_none:'' }}">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="box-body table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{% trans 'Name' %}</th>
+                    <th>{% trans 'Alias' %}</th>
+                    <th>{% trans 'Is global?' %}</th>
+                    <th>{% trans 'JSON schema?' %}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for component in components %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'component_base_settings' pk=component.pk %}">{{ component.name|upper }}</a>
+                        </td>
+                        <td>{{ component.alias }}</td>
+                        <td>{% true_false_icon component.is_global %}</td>
+                        <td>{% true_false_icon component.use_schema %}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm pull-right">
+                                {% url 'add_component_start' pk=component.pk as add_star_url %}
+                                {% url 'remove_component_start' pk=component.pk as remove_star_url %}
+                                 <a href="{% if component.pk in components_stars %}{{ remove_star_url }}{% else %}{{ add_star_url }}{% endif %}" class="btn btn-default toggle-star"
+                                   data-id="{{ component.pk }}"
+                                   data-toggle="tooltip"
+                                   data-url-add="{{ add_star_url }}"
+                                   data-url-remove="{{ remove_star_url }}"
+                                    title="{% trans 'Toggle favourite' %}">
+                                    <i class="{% if component.pk in components_stars %}text-yellow{% else %}text-gray{% endif %} fa fa-star"></i>
+                                </a>
+                                {% object_has_perm components_perms component 'change_component' as can_change %}
+                                {% if can_change %}
+                                    <a href="{% url 'update_component' pk=component.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Edit' %}">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                {% endif %}
+                                {% object_has_perm components_perms component 'delete_component' as can_delete %}
+                                {% if can_delete %}
+                                    <a href="{% url 'delete_component' pk=component.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Delete' %}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4
+">
+                            <p class="text-center">{% trans 'No components found.' %}</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="box-footer">
+            {% pagination page_obj %}
+        </div>
+    </div>
+{% endblock %}

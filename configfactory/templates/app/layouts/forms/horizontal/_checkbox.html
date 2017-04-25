@@ -1,0 +1,14 @@
+{% load form_tags %}
+
+<div class="form-group {% if field.errors %}has-error{% endif %} {{ class }}">
+    <div class="col-sm-offset-2 col-sm-6">
+        <div class="checkbox">
+            <label>
+                {{ field }} {{ field.label }}
+            </label>
+            {% include 'app/layouts/forms/_help_block.html' with field=field %}
+            {% include 'app/layouts/forms/_error_block.html' with field=field %}
+        </div>
+    </div>
+</div>
+

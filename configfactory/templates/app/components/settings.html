@@ -1,0 +1,61 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n menu_tags static %}
+
+{% block page_js %}
+    {{ block.super }}
+    <script src="{% static 'vendor/ace/ace.js' %}"></script>
+    <script src="{% static 'vendor/ace/theme-tomorrow_night.js' %}"></script>
+    <script src="{% static 'vendor/ace/mode-json.js' %}"></script>
+    <script src="{% static 'vendor/jquery-ace/jquery-ace.min.js' %}"></script>
+    <script>
+        var $editor = $('#id_settings_json').ace({
+            theme: 'tomorrow_night',
+            lang: 'json'
+        });
+        $editor.data('ace').editor.ace.setReadOnly(true);
+    </script>
+{% endblock %}
+
+{% block title %}<strong>{{ component.name }} <span class="small">{{ component.alias }}</span></strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'components' %}">{% trans 'Components' %}</a></li>
+    <li class="active">{{ component.name }}{% if environment %} ({{ environment.name }}){% endif %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="box-header with-border">
+                <h3 class="box-title">{% if environment %}{{ environment.name }}{% else %}Base{% endif %}</h3>
+                <div class="box-tools">
+                    {% if view_toggle == 'flatten' %}
+                        <a href="{{ config_url }}?view=normal" class="btn btn-sm btn-default">
+                            <i class="fa fa-align-center"></i> {% trans 'Normal View' %}
+                        </a>
+                    {% else %}
+                        <a href="{{ config_url }}?view=flatten" class="btn btn-sm btn-default">
+                            <i class="fa fa-align-justify"></i> {% trans 'Flatten View' %}
+                        </a>
+                    {% endif %}
+                    {% if 'change_component' in component_perms %}
+                        <a href="{% if environment %}{% url 'update_component_env_settings' pk=component.pk alias=environment.alias %}{% else %}{% url 'update_component_base_settings' pk=component.pk %}{% endif %}" class="btn btn-sm btn-primary">
+                            {% trans 'Edit Mode' %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="nav-tabs-custom">
+                    {% environments_tabs request component %}
+                    <div class="tab-content no-padding">
+                        <div class="tab-pane active">
+                            {{ form.settings_json }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

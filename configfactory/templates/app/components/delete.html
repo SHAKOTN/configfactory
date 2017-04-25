@@ -1,0 +1,39 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags %}
+
+{% block title %}
+    {% blocktrans with name=component.name alias=component.alias %}
+        Delete <strong>{{ name }} <span class="small">{{ alias }}</span></strong>
+    {% endblocktrans %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'components' %}">{% trans 'Components' %}</a></li>
+    <li><a href="{% url 'component_base_settings' pk=component.pk %}">{{ component.name }}</a></li>
+    <li class="active">{% trans 'Delete' %}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% if delete_error %}
+        <div class="callout callout-danger">
+            <h4>{% trans 'Unable to delete component!' %}</h4>
+            {{ delete_error|safe }}
+        </div>
+    {% endif %}
+
+    <div class="box box-danger">
+        <form method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% blocktrans with name=component.name %}
+                    <p>Are you sure you want to delete <strong>{{ name }}</strong> component ?</p>
+                {% endblocktrans %}
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-danger">{% trans 'Yes, delete' %}</button>
+                {% back_btn request 'components' %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

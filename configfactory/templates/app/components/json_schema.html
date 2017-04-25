@@ -1,0 +1,65 @@
+{% extends 'app/layouts/main.html' %}
+{% load menu_tags static i18n guardian_tags ui_tags %}
+
+{% block page_js %}
+    {{ block.super }}
+    <script src="{% static 'vendor/ace/ace.js' %}"></script>
+    <script src="{% static 'vendor/ace/theme-tomorrow_night.js' %}"></script>
+    <script src="{% static 'vendor/ace/mode-json.js' %}"></script>
+    <script src="{% static 'vendor/jquery-ace/jquery-ace.min.js' %}"></script>
+    <script>
+        var $editor = $('#id_schema_json').ace({
+            theme: 'tomorrow_night',
+            lang: 'json'
+        });
+        {% if False %}
+            $editor.data('ace').editor.ace.setReadOnly(true);
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block title %}{% trans 'Edit' %} <strong>{{ component.name }} <span class="small">{{ component.alias }}</span></strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'components' %}">{% trans 'Components' %}</a></li>
+    <li><a href="{% url 'component_base_settings' pk=component.pk %}">{{ component.name }}</a></li>
+    <li class="active">{% trans 'JSON Schema' %}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% get_obj_perms user for component as 'component_perms' %}
+
+    {% if form.schema_json.errors %}
+        <div class="callout callout-danger">
+            <h4>{% trans 'Unable to change schema!' %}</h4>
+            {{ form.schema_json.errors|first|safe }}
+        </div>
+    {% endif %}
+
+    <div class="box">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <div class="nav-tabs-custom">
+                    <div class="tab-content no-padding">
+                        <div class="tab-pane active">
+                            {{ form.schema_json }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    {% if 'change_component' in component_perms %}
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                        <a href="{% url 'update_component' pk=component.pk %}?next={{ request.path }}" class="btn btn-primary">
+                            {% trans 'Edit Component' %}
+                        </a>
+                    {% endif %}
+                    {% back_btn request 'component_base_settings' pk=component.pk %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<ul class="sidebar-menu">
+    {% for item in items %}
+        {% if item.header %}
+            <li class="header">{{ item.title|upper }}</li>
+        {% else %}
+            <li class="{% if item.children %}treeview{% endif %} {% if item.active %}active{% endif %}">
+                <a href="{% if item.url %}{{ item.url }}{% else %}#{% endif %}">
+                    {% if item.icon %}<i class="fa fa-{{ item.icon }}"></i>{% endif %} <span>{{ item.title|upper }}</span> {% if item.has_star %}<i class="text-yellow pull-right fa fa-star"></i>{% endif %}
+                    {% if item.children %}
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    {% endif %}
+                </a>
+                {% if item.children %}
+                    <ul class="treeview-menu {% if item.active %}menu-open{% endif %}">
+                        {% for child in item.children %}
+                            <li class="{% if child.active %}active{% endif %}">
+                                <a href="{{ child.url }}">
+                                    <i class="fa fa-{% if child.icon %}{{ child.icon }}{% else %}circle-o{% endif %}"></i> {{ child.title|upper }} {% if child.has_star %}<i class="text-yellow pull-right fa fa-star"></i>{% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

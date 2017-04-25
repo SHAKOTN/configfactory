@@ -1,0 +1,24 @@
+{% extends 'app/layouts/base.html' %}
+{% load i18n %}
+
+{% block body_class %}hold-transition login-page{% endblock %}
+
+{% block body %}
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="{% url 'login' %}"><b>Config</b>Factory</a>
+        </div>
+        <div class="login-box-body">
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                {% include 'app/layouts/forms/vertical/_input.html' with field=form.username class='has-feedback' span_class='glyphicon glyphicon-envelope' %}
+                {% include 'app/layouts/forms/vertical/_input.html' with field=form.password class='has-feedback' span_class='glyphicon glyphicon-lock' %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">{% trans 'Login' %}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

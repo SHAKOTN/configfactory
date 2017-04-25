@@ -1,0 +1,31 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n ui_tags %}
+
+{% block title %}{% trans 'Users' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">{% trans 'Users' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <form role="form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.email %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.first_name %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.last_name %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_staff %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_superuser %}
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
+                        {% back_btn request 'users' %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

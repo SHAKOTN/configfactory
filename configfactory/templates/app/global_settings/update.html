@@ -1,0 +1,29 @@
+{% extends 'app/layouts/main.html' %}
+{% load i18n form_tags %}
+
+{% block title %}{% trans 'Edit global settings' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">{% trans 'Global settings' %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <form role="form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.indent %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.cleansed_hidden %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.cleansed_substitute %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.inject_validation %}
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

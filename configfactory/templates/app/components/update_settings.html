@@ -1,0 +1,79 @@
+{% extends 'app/layouts/main.html' %}
+{% load menu_tags static i18n guardian_tags %}
+
+{% block page_js %}
+    {{ block.super }}
+    <script src="{% static 'vendor/ace/ace.js' %}"></script>
+    <script src="{% static 'vendor/ace/theme-tomorrow_night.js' %}"></script>
+    <script src="{% static 'vendor/ace/mode-json.js' %}"></script>
+    <script src="{% static 'vendor/jquery-ace/jquery-ace.min.js' %}"></script>
+    <script>
+        $('#id_settings_json').ace({
+            theme: 'tomorrow_night',
+            lang: 'json'
+        });
+    </script>
+{% endblock %}
+
+{% block title %}{% trans 'Edit' %} <strong>{{ component.name }} <span class="small">{{ component.alias }}</span></strong>{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'components' %}">{% trans 'Components' %}</a></li>
+    <li class="active">{% trans 'Edit' %} {{ component.name }}{% if environment %} ({{ environment.name }}){% endif %}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% get_obj_perms user for component as 'component_perms' %}
+
+    {% if form.settings_json.errors %}
+        <div class="callout callout-danger">
+            <h4>{% trans 'Unable to change settings!' %}</h4>
+            {{ form.settings_json.errors|first|safe }}
+        </div>
+    {% endif %}
+
+    <div class="box">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="box-header with-border">
+                <h3 class="box-title">{% if environment %}{{ environment.name }}{% else %}Base{% endif %}</h3>
+                <div class="box-tools">
+                    <a href="{% if environment %}{% url 'component_env_settings' pk=component.pk alias=environment.alias %}{% else %}{% url 'component_base_settings' pk=component.pk %}{% endif %}" class="btn btn-sm btn-primary">
+                        {% trans 'View Mode' %}
+                    </a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="nav-tabs-custom">
+                    {% environments_tabs request component edit=True %}
+                    <div class="tab-content no-padding">
+                        <div class="tab-pane active">
+                            {{ form.settings_json }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    {% if 'change_component' in component_perms %}
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                        {% if component.use_schema %}
+                            <a href="{% url 'component_json_schema' pk=component.pk %}?next={{ request.path }}" class="btn btn-primary">
+                                {% trans 'Edit JSON Schema' %}
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'update_component' pk=component.pk %}?next={{ request.path }}" class="btn btn-primary">
+                            {% trans 'Edit' %}
+                        </a>
+                    {% endif %}
+                    {% if 'delete_component' in component_perms %}
+                        <a href="{% url 'delete_component' pk=component.pk %}?next={{ request.path }}" class="btn btn-danger">
+                            {% trans 'Delete' %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

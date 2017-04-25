@@ -1,0 +1,17 @@
+{% load menu_tags i18n %}
+
+<aside class="main-sidebar">
+    <section class="sidebar">
+        <form action="{% url 'components' %}" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="{% trans 'Search component...' %}" value="{{ components_search|default_if_none:'' }}">
+                <span class="input-group-btn">
+                    <button type="submit" id="search-btn" class="btn btn-flat">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        </form>
+        {% sidebar_menu request %}
+    </section>
+</aside>
