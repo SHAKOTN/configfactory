@@ -333,7 +333,7 @@ class ComponentSettingsView(TemplateView):
             }
         )
         form.fields['settings_json'].widget.attrs.update({
-            'rows': self.get_rows_length(settings_json)
+            'rows': get_rows_length(settings_json)
         })
 
         context.update({
@@ -400,9 +400,6 @@ class ComponentSettingsView(TemplateView):
             })
         return reverse(viewname, kwargs=viewkwargs)
 
-    def get_rows_length(self, content):
-        return min(max(len(content.splitlines()), 24), 32)
-
 
 @method_decorator(login_required, name='dispatch')
 class ComponentSettingsUpdateView(ComponentSettingsView):
@@ -433,7 +430,7 @@ class ComponentSettingsUpdateView(ComponentSettingsView):
             }
         )
         form.fields['settings_json'].widget.attrs.update({
-            'rows': self.get_rows_length(settings_json)
+            'rows': get_rows_length(settings_json)
         })
 
         context.update({
@@ -455,7 +452,7 @@ class ComponentSettingsUpdateView(ComponentSettingsView):
             data=request.POST,
         )
         form.fields['settings_json'].widget.attrs.update({
-            'rows': self.get_rows_length(
+            'rows': get_rows_length(
                 request.POST.get('settings_json', '')
             )
         })
@@ -508,7 +505,7 @@ class ComponentJSONSchemaView(TemplateView):
             }
         )
         form.fields['schema_json'].widget.attrs.update({
-            'rows': self.get_rows_length(schema_json)
+            'rows': get_rows_length(schema_json)
         })
 
         context.update({
@@ -530,7 +527,7 @@ class ComponentJSONSchemaView(TemplateView):
 
         form = JSONSchemaForm(data=request.POST)
         form.fields['schema_json'].widget.attrs.update({
-            'rows': self.get_rows_length(schema_json)
+            'rows': get_rows_length(schema_json)
         })
 
         if form.is_valid():
@@ -580,9 +577,6 @@ class ComponentJSONSchemaView(TemplateView):
 
         return data
 
-    def get_rows_length(self, content):
-        return min(max(len(content.splitlines()), 24), 32)
-
     def get_components(self):
         return get_objects_for_user(
             user=self.request.user,
@@ -591,3 +585,7 @@ class ComponentJSONSchemaView(TemplateView):
             ),
             klass=Component
         )
+
+
+def get_rows_length(content):
+    return min(max(len(content.splitlines()), 36), 48)
