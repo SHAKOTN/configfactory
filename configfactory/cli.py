@@ -14,8 +14,7 @@ from configfactory.server import ServerApplication
 
 @click.group()
 @click.option(
-    '-c',
-    '--config',
+    '--config', '-c',
     required=False,
     envvar='CONFIGFACTORY_CONFIG',
     type=click.Path(exists=True),
@@ -89,21 +88,18 @@ def init(f):
 
 @app_command()
 @click.option(
-    '-h',
-    '--host',
+    '--host', '-h',
     help='TCP/IP host to serve on (default: 127.0.0.1).',
     default='127.0.0.1'
 )
 @click.option(
-    '-p',
-    '--port',
+    '--port', '-p',
     help='TCP/IP port to serve on (default: 8080).',
     type=click.INT,
     default='8080'
 )
 @click.option(
-    '-w',
-    '--workers',
+    '--workers', '-w',
     help='The number of worker processes for handling requests.',
     type=click.INT,
     default=1
@@ -115,7 +111,8 @@ def run(host, port, workers):
 
     wsgi_app = Cling(get_wsgi_application())
 
-    settings.ALLOWED_HOSTS.append(host)
+    if isinstance(settings.ALLOWED_HOSTS, list):
+        settings.ALLOWED_HOSTS.append(host)
 
     server = ServerApplication(
         wsgi_app=wsgi_app,

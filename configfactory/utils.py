@@ -18,6 +18,7 @@ from configfactory.settings import GLOBAL_SETTINGS_DEFAULTS
 key_re = r'[a-zA-Z][(\-|\.)a-zA-Z0-9_]*'
 inject_regex = re.compile(r'(?<!\$)(\$(?:{param:(%(n)s)}))'
                           % ({'n': key_re}))
+pytype_regex = re.compile(r'\"pytype:.+\"')
 
 
 def merge_dict(d1, d2):
@@ -106,13 +107,32 @@ def cleanse_value(key, value, hidden=None, substitute=None):
     return cleansed
 
 
+class JSONDecoder(json.JSONDecoder):
+
+    def decode(self, s, **kwargs):
+        s = pytype_regex.sub(self.replace, s)
+        return super().decode(s, **kwargs)
+
+    @staticmethod
+    def replace(match):
+        s = match.group()
+        val = s.replace('\"', '').split(':')[-1]
+        if val == 'True':
+            return 'true'
+        elif val == 'False':
+            return 'false'
+        return val
+
+
 def json_dumps(obj, indent=None):
     return json.dumps(obj, indent=indent)
 
 
 def json_loads(s):
     try:
-        return json.loads(s, object_pairs_hook=OrderedDict)
+        return json.loads(s,
+                          object_pairs_hook=OrderedDict,
+                          cls=JSONDecoder)
     except Exception as e:
         raise JSONEncodeError(
             'Invalid JSON: {}.'.format(e)
@@ -141,7 +161,10 @@ def inject_params(
     def replace(match):
         whole, key = match.groups()
         try:
-            return params[key]
+            val = params[key]
+            if not isinstance(val, str):
+                return 'pytype:{}'.format(params[key])
+            return val
         except KeyError:
             if raise_exception:
                 raise InjectKeyError(

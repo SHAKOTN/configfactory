@@ -9,6 +9,8 @@ from configfactory.test.factories import EnvironmentFactory, UserFactory
 
 class ServicesTestCase(TestCase):
 
+    maxDiff = None
+
     def test_get_settings_data_empty(self):
 
         self.assertDictEqual(
@@ -28,13 +30,13 @@ class ServicesTestCase(TestCase):
             alias='params',
             is_global=True
         )
-        params_component_config = params_component\
-            .configs\
-            .get(environment__isnull=True)
+        params_component_config = params_component.configs.base().get()
         params_component_config.settings_content = """
         {
             "debug": true,
-            "timezone": "UTC"
+            "timezone": "UTC",
+            "default_host": "localhost",
+            "default_port": 5555
         }
         """
         params_component_config.save()
@@ -44,13 +46,11 @@ class ServicesTestCase(TestCase):
             alias='amqp',
             is_global=False
         )
-        amqp_component_config = amqp_component\
-            .configs\
-            .get(environment__isnull=True)
+        amqp_component_config = amqp_component.configs.base().get()
         amqp_component_config.settings_content = """
         {
             "default": {
-                "url": "amqp://10.10.10.10:6789"
+                "url": "amqp://${param:params.default_host}:6789"
             }
         }
         """
@@ -61,14 +61,13 @@ class ServicesTestCase(TestCase):
             alias='db',
             is_global=False
         )
-        db_component_config = db_component\
-            .configs\
-            .get(environment__isnull=True)
+        db_component_config = db_component.configs.base().get()
         db_component_config.settings_content = """
         {
             "default": {
-                "host": "127.0.0.1",
-                "port": 5567,
+                "debug": "${param:params.debug}",
+                "host": "${param:params.default_host}",
+                "port": "${param:params.default_port}",
                 "name": "default",
                 "username": "root",
                 "password": "123123"
@@ -80,17 +79,20 @@ class ServicesTestCase(TestCase):
         expected = {
             'params': {
                 'debug': True,
-                'timezone': 'UTC'
+                'timezone': 'UTC',
+                'default_host': 'localhost',
+                'default_port': 5555
             },
             'amqp': {
                 'default': {
-                    'url': 'amqp://10.10.10.10:6789'
+                    'url': 'amqp://localhost:6789'
                 }
             },
             'db': {
                 'default': {
-                    'host': '127.0.0.1',
-                    'port': 5567,
+                    'debug': True,
+                    'host': 'localhost',
+                    'port': 5555,
                     'name': 'default',
                     'username': 'root',
                     'password': '123123',
@@ -98,7 +100,7 @@ class ServicesTestCase(TestCase):
             }
         }
 
-        data = get_settings()
+        data = get_settings(inject=True)
 
         self.assertDictEqual(data, expected)
 
