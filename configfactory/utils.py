@@ -107,36 +107,27 @@ def cleanse_value(key, value, hidden=None, substitute=None):
     return cleansed
 
 
-class JSONDecoder(json.JSONDecoder):
-
-    def decode(self, s, **kwargs):
-        s = pytype_regex.sub(self.replace, s)
-        return super().decode(s, **kwargs)
-
-    @staticmethod
-    def replace(match):
-        s = match.group()
-        val = s.replace('\"', '').split(':')[-1]
-        if val == 'True':
-            return 'true'
-        elif val == 'False':
-            return 'false'
-        return val
-
-
 def json_dumps(obj, indent=None):
     return json.dumps(obj, indent=indent)
 
 
 def json_loads(s):
     try:
-        return json.loads(s,
-                          object_pairs_hook=OrderedDict,
-                          cls=JSONDecoder)
+        return json.loads(s, object_pairs_hook=OrderedDict)
     except Exception as e:
         raise JSONEncodeError(
             'Invalid JSON: {}.'.format(e)
         )
+
+
+def replace_pytype(match):
+    content = match.group()
+    val = content.replace('\"', '').split(':')[-1]
+    if val == 'True':
+        return 'true'
+    elif val == 'False':
+        return 'false'
+    return val
 
 
 def inject_params(
@@ -158,7 +149,7 @@ def inject_params(
 
     calls += 1
 
-    def replace(match):
+    def replace_param(match):
         whole, key = match.groups()
         try:
             val = params[key]
@@ -175,7 +166,7 @@ def inject_params(
                 )
             return whole
 
-    content = inject_regex.sub(replace, content)
+    content = inject_regex.sub(replace_param, content)
 
     if inject_regex.search(content):
         return inject_params(
@@ -184,6 +175,8 @@ def inject_params(
             calls=calls,
             raise_exception=raise_exception
         )
+
+    content = pytype_regex.sub(replace_pytype, content)
 
     return content
 

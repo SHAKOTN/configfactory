@@ -22,7 +22,13 @@ from guardian.shortcuts import get_objects_for_user, get_perms
 
 from configfactory.exceptions import ComponentDeleteError
 from configfactory.forms import ConfigForm, JSONSchemaForm
-from configfactory.models import Component, Environment, JSONSchema, User, UserComponentStar
+from configfactory.models import (
+    Component,
+    Environment,
+    JSONSchema,
+    User,
+    UserComponentStar,
+)
 from configfactory.services import (
     add_component_star,
     delete_component,
