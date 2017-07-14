@@ -1,0 +1,29 @@
+{
+  "name": "configfactory",
+  "version": "1.0.0",
+  "description": "Configurations manager",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antonrh/configfactory.git"
+  },
+  "author": "Anton Ruhlov <antonruhlov@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/antonrh/configfactory/issues"
+  },
+  "homepage": "https://github.com/antonrh/configfactory#readme",
+  "devDependencies": {
+    "webpack": "^3.2.0",
+    "webpack-bundle-tracker": "^0.2.0"
+  },
+  "dependencies": {
+    "admin-lte": "^2.3.11"
+  }
+}
