@@ -39,7 +39,3 @@ class ComponentDeleteError(Exception):
 
     def __str__(self):
         return self.message
-
-
-class UserHasNoToken(Exception):
-    pass
