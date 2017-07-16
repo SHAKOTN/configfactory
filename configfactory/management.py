@@ -17,6 +17,4 @@ def create_global_settings(verbosity=2, using=DEFAULT_DB_ALIAS, apps=global_apps
     if not GlobalSettings.objects.using(using).exists():
         if verbosity >= 2:
             print("Creating GlobalSettings object")
-        GlobalSettings.objects\
-            .using(using)\
-            .create(**GLOBAL_SETTINGS_DEFAULTS)
+        GlobalSettings.objects.using(using).create(**GLOBAL_SETTINGS_DEFAULTS)
