@@ -10,7 +10,7 @@
 {% block content %}
 
     <div class="box">
-        {% if user.is_staff %}
+        {% if current_user.is_staff %}
             <div class="box-header with-border">
                 <h3 class="box-title"></h3>
                 <div class="box-tools">
@@ -39,7 +39,7 @@
                         <td>{{ environment.order }}</td>
                         <td>
                             <div class="btn-group btn-group-sm pull-right">
-                                {% if user.is_superuser %}
+                                {% if current_user.is_superuser %}
                                     <a href="" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Duplicate' %}">
                                         <i class="fa fa-copy"></i>
                                     </a>

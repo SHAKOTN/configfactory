@@ -1,90 +1,88 @@
-{% extends 'app/layouts/main.html' %}
+{% extends 'app/users/layouts/users.html' %}
 {% load i18n menu_tags ui_tags %}
 
-{% block title %}<strong>{{ object.get_full_name }}</strong> {% trans 'Permissions' %}{% endblock %}
+{% block title %}{% trans 'Change' %} <strong>{{ user }}</strong> {% trans 'permissions' %}{% endblock %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'users' %}">{% trans 'Users' %}</a></li>
-    <li><a href="{% url 'update_user' pk=object.pk %}">{{ object }}</a></li>
+    <li><a href="{% url 'update_user' pk=user.pk %}">{{ user }}</a></li>
     <li class="active">{% trans 'Permissions' %}</li>
 {% endblock %}
 
 {% block content %}
-    <div class="box">
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="box-body table-responsive">
-                <div class="nav-tabs-custom">
-                    {% permission_types_tabs request user=object %}
-                    <div class="tab-content no-padding">
-                        <div class="tab-pane active">
-                            <table class="table">
-                                <thead>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="box-body table-responsive">
+            <div class="nav-tabs-custom">
+                {% permission_types_tabs request user=user %}
+                <div class="tab-content no-padding">
+                    <div class="tab-pane active">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th style="width: 70%">{% trans 'Name' %}</th>
+                                <th style="width: 10%" class="text-center">{% trans 'View' %}</th>
+                                <th style="width: 10%" class="text-center">{% trans 'Change' %}</th>
+                                <th style="width: 10%" class="text-center">{% trans 'Delete' %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for obj in object_list %}
+                                {% with obj.pk|stringformat:"s" as obj_id %}
                                 <tr>
-                                    <th style="width: 70%">{% trans 'Name' %}</th>
-                                    <th style="width: 10%" class="text-center">{% trans 'View' %}</th>
-                                    <th style="width: 10%" class="text-center">{% trans 'Change' %}</th>
-                                    <th style="width: 10%" class="text-center">{% trans 'Delete' %}</th>
+                                    <td>
+                                        {% if obj.get_absolute_url %}
+                                            <a href="{{ obj.get_absolute_url }}?next={{ request.path }}">{{ obj }}</a>
+                                        {% else %}
+                                            {{ obj }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <label>
+                                            {% with 'view_'|add:model_name|add:":"|add:obj_id as perm %}
+                                                {% if perm in self_perms %}
+                                                    <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <label>
+                                            {% with 'change_'|add:model_name|add:":"|add:obj_id as perm %}
+                                                {% if perm in self_perms %}
+                                                    <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <label>
+                                            {% with 'delete_'|add:model_name|add:":"|add:obj_id as perm %}
+                                                {% if perm in self_perms %}
+                                                    <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </label>
+                                    </td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {% for obj in object_list %}
-                                    {% with obj.pk|stringformat:"s" as obj_id %}
-                                    <tr>
-                                        <td>
-                                            {% if obj.get_absolute_url %}
-                                                <a href="{{ obj.get_absolute_url }}">{{ obj }}</a>
-                                            {% else %}
-                                                {{ obj }}
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-center">
-                                            <label>
-                                                {% with 'view_'|add:model_name|add:":"|add:obj_id as perm %}
-                                                    {% if perm in self_perms %}
-                                                        <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
-                                                    {% endif %}
-                                                {% endwith %}
-                                            </label>
-                                        </td>
-                                        <td class="text-center">
-                                            <label>
-                                                {% with 'change_'|add:model_name|add:":"|add:obj_id as perm %}
-                                                    {% if perm in self_perms %}
-                                                        <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
-                                                    {% endif %}
-                                                {% endwith %}
-                                            </label>
-                                        </td>
-                                        <td class="text-center">
-                                            <label>
-                                                {% with 'delete_'|add:model_name|add:":"|add:obj_id as perm %}
-                                                    {% if perm in self_perms %}
-                                                        <input type="checkbox" name="perms" value="{{ perm }}" {% if perm in perms %}checked{% endif %}>
-                                                    {% endif %}
-                                                {% endwith %}
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    {% endwith %}
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="4">
-                                            <p class="text-center">{% trans 'No objects found.' %}</p>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endwith %}
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">
+                                        <p class="text-center">{% trans 'No objects found.' %}</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="box-footer">
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
-                </div>
+        </div>
+        <div class="box-footer">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'app/users/layouts/users.html' %}
+{% load i18n menu_tags ui_tags %}
+
+{% block title %}{% trans 'Change' %} <strong>{{ user }}</strong> {% trans 'API Settings' %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'users' %}">{% trans 'Users' %}</a></li>
+    <li><a href="{% url 'update_user' pk=user.pk %}">{{ user }}</a></li>
+    <li class="active">{% trans 'API Settings' %}</li>
+{% endblock %}
+
+{% block content %}
+    {% if user.is_apiuser and has_users %}
+        <div class="tab-content">
+            <div class="alert alert-warning alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-warning"></i> {% trans 'Warning' %}!</h4>
+                {% blocktrans %}
+                    There are users who are probably using existed API token.
+                    If you change existed API token then they will not be able to do API calls
+                    without changing configuration.
+                {% endblocktrans %}
+            </div>
+        </div>
+    {% endif %}
+    <form role="form" class="form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="box-body">
+            {% if not user.is_apiuser %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.api_user %}
+            {% endif %}
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.api_token span_class='fa fa-key' %}
+        </div>
+        <div class="box-footer">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-6">
+                    {% if user.is_apiuser %}
+                        <button type="submit" class="btn btn-primary">{% trans 'Change token' %}</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

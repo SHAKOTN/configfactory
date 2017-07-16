@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-from configfactory.models import ApiToken
+from configfactory.models import User
 
 
 class TokenAuthentication(BaseAuthentication):
@@ -19,13 +19,11 @@ class TokenAuthentication(BaseAuthentication):
             raise AuthenticationFailed(_('Token is required.'))
 
         try:
-            api_token = ApiToken.objects.select_related('user').get(token=token)
-        except ApiToken.DoesNotExist:
+            user = User.objects.active().get(api_token=token)
+        except User.DoesNotExist:
             raise AuthenticationFailed(_('Invalid token.'))
 
-        user = api_token.user
-
-        if not user.is_active:
+        if not user.has_api_access:
             raise AuthenticationFailed(_('User inactive or deleted.'))
 
         return user, token

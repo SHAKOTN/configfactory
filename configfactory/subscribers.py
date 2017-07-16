@@ -1,9 +1,8 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.forms import model_to_dict
 
 from configfactory.models import (
-    ApiToken,
     Component,
     Config,
     Environment,
@@ -57,10 +56,7 @@ def reload_global_settings(instance, **kwargs):
         global_settings[key] = value
 
 
-@receiver(post_save, sender=User)
-def create_user_api_token(instance, created, **kwargs):
-    if created:
-        api_token = ApiToken()
-        api_token.user = instance
-        api_token.token = generate_api_token()
-        api_token.save()
+@receiver(pre_save, sender=User)
+def set_user_api_token(instance: User, **kwargs):
+    if instance.is_apiuser and not instance.api_token:
+        instance.api_token = generate_api_token()

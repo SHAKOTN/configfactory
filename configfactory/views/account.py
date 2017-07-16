@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.http import Http404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
@@ -8,8 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView
 from rest_framework.reverse import reverse
 
-from configfactory.forms import ApiTokenForm
-from configfactory.services import get_user_api_token
+from configfactory.forms import UserAPIForm
+from configfactory.models import User
+from configfactory.services import get_api_token
 
 
 @method_decorator(login_required, name='dispatch')
@@ -36,7 +38,7 @@ class PersonalInfoView(UpdateView):
 @method_decorator(login_required, name='dispatch')
 class PasswordChangeView(UpdateView):
 
-    template_name = 'app/account/password_change.html'
+    template_name = 'app/account/password.html'
 
     success_url = reverse_lazy('password_change')
 
@@ -74,19 +76,26 @@ class APISettingsView(UpdateView):
 
     success_url = reverse_lazy('api_settings')
 
-    form_class = ApiTokenForm
+    form_class = UserAPIForm
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        if not user.has_api_access:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
-        return get_user_api_token(self.request.user)
+        return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        api_token = self.object
+        user = self.object  # type: User
+        api_token = get_api_token(user)
         context.update({
             'api_url': '{uri}?{params}'.format(
                 uri=reverse('api:environments', request=self.request),
                 params=urlencode({
-                    'token': api_token.token
+                    'token': api_token
                 })
             )
         })

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Union
+from typing import Union, Optional
 
 import dictdiffer
 import jsonschema
@@ -15,14 +15,14 @@ from configfactory.exceptions import (
     InjectKeyError,
 )
 from configfactory.models import (
-    ApiToken,
     Component,
     Config,
     Environment,
     JSONSchema,
     LogEntry,
     User,
-    UserComponentStar)
+    UserComponentStar,
+)
 from configfactory.utils import (
     cleanse_dict,
     flatten_dict,
@@ -277,22 +277,27 @@ def duplicate_environment(environment: Environment,
 def generate_api_token() -> str:
     from django.utils.crypto import get_random_string
     while True:
-        token = get_random_string(
-            length=48,
-            allowed_chars='abcdefghijklmnopqrstuvwxyz0123456789'
-        )
-        if not ApiToken.objects.filter(token=token).exists():
+        token = get_random_string(48)
+        if not User.objects.filter(api_token=token).exists():
             return token
 
 
-def get_user_api_token(user: User) -> ApiToken:
-    try:
-        api_token = user.api_token
-    except ApiToken.DoesNotExist:
-        api_token = ApiToken(user=user)
-        api_token.token = generate_api_token()
-        api_token.save()
-    return api_token
+def get_api_user(user: User) -> Optional[User]:
+    if user.is_apiuser or user.is_superuser:
+        return user
+    if user.api_user_id:
+        return user.api_user
+    return None
+
+
+def get_api_token(user: User) -> str:
+    api_user = get_api_user(user)
+    if api_user is None:
+        return ''
+    if not api_user.api_token:
+        api_user.api_token = generate_api_token()
+        api_user.save()
+    return api_user.api_token
 
 
 def add_component_star(user: User, component: Component) -> bool:

@@ -1,51 +1,37 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from configfactory.managers import UserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractUser):
 
-    first_name = models.CharField(
-        max_length=32,
+    api_user = models.ForeignKey(
+        to='self',
         blank=True,
-        verbose_name=_('first name')
+        null=True,
+        related_name='users',
+        verbose_name=_('API user'),
+        help_text=_('User with API access.'),
     )
 
-    last_name = models.CharField(
-        max_length=32,
+    api_token = models.CharField(
+        max_length=48,
+        verbose_name=_('API token'),
         blank=True,
-        verbose_name=_('last name')
+        null=True,
+        unique=True
     )
 
-    email = models.EmailField(
-        unique=True,
-        verbose_name=_('email address')
-    )
-
-    is_staff = models.BooleanField(
-        _('staff status'),
+    is_apiuser = models.BooleanField(
         default=False,
-        help_text=_('Designates whether the user can '
-                    'log into this admin site.'),
-    )
-
-    is_active = models.BooleanField(
-        _('active'),
-        default=True,
+        verbose_name=_('API user status'),
         help_text=_(
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
+            'Designates whether the user can call API.'
         ),
     )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('created datetime')
-    )
-
-    USERNAME_FIELD = 'email'
 
     objects = UserManager()
 
@@ -53,16 +39,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
-    def __str__(self):
-        return self.get_full_name()
-
-    def get_full_name(self) -> str:
-        if not self.first_name or not self.last_name:
-            return self.email
-        full_name = '%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
-
-    def get_short_name(self) -> str:
-        if self.first_name is None:
-            return self.email
-        return self.first_name
+    @cached_property
+    def has_api_access(self):
+        return (
+            self.is_apiuser
+            or self.is_superuser
+            or self.api_user_id is not None
+        )

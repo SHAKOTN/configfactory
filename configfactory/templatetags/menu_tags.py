@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from guardian.shortcuts import get_objects_for_user
 
-from configfactory.models import Component, Environment, UserComponentStar
+from configfactory.models import Component, Environment, UserComponentStar, User
 
 register = Library()
 
@@ -112,11 +112,13 @@ def sidebar_menu(request):
                 'icon': 'users',
                 'active': url_name in [
                     'users',
+                    'change_user_password',
                     'create_user',
                     'update_user',
+                    'update_user_api_settings',
                     'update_user_permissions',
                     'update_user_permissions_by_model',
-                    'delete_user'
+                    'delete_user',
                 ]
             },
             {
@@ -201,12 +203,13 @@ def environments_tabs(request, component, edit=False):
 @register.inclusion_tag('app/layouts/tags/tabs.html')
 def account_tabs(request):
 
+    user = request.user  # type: User
     resolver_match = request.resolver_match
     url_name = resolver_match.url_name
 
     items = [
         {
-            'title': _('Personal'),
+            'title': _('Personal info'),
             'active': url_name == 'personal_info',
             'url': reverse('personal_info')
         },
@@ -215,11 +218,59 @@ def account_tabs(request):
             'active': url_name == 'password_change',
             'url': reverse('password_change')
         },
-        {
-            'title': _('API'),
+    ]
+
+    if user.has_api_access:
+        items.append({
+            'title': _('API settings'),
             'active': url_name == 'api_settings',
             'url': reverse('api_settings')
+        })
+
+    return {
+        'request': request,
+        'items': items,
+    }
+
+
+@register.inclusion_tag('app/layouts/tags/tabs.html')
+def user_tabs(request, user):
+
+    resolver_match = request.resolver_match
+    url_name = resolver_match.url_name
+
+    items = [
+        {
+            'title': _('User data'),
+            'active': url_name == 'update_user',
+            'url': reverse('update_user', kwargs={
+                'pk': user.pk
+            })
         },
+        {
+            'title': _('Password'),
+            'active': url_name == 'change_user_password',
+            'url': reverse('change_user_password', kwargs={
+                'pk': user.pk
+            })
+        },
+        {
+            'title': _('Permissions'),
+            'active': url_name in [
+                'update_user_permissions',
+                'update_user_permissions_by_model',
+            ],
+            'url': reverse('update_user_permissions', kwargs={
+                'pk': user.pk
+            })
+        },
+        {
+            'title': _('API Settings'),
+            'active': url_name == 'update_user_api_settings',
+            'url': reverse('update_user_api_settings', kwargs={
+                'pk': user.pk
+            })
+        }
     ]
 
     return {

@@ -1,12 +1,17 @@
 from collections import OrderedDict
 
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import UserManager as BaseUserManager
 from django.db import models
 from guardian.shortcuts import get_objects_for_user
 
 
 class UserQuerySet(models.QuerySet):
-    pass
+
+    def active(self):
+        return self.filter(is_active=True)
+
+    def api(self):
+        return self.filter(is_apiuser=True)
 
 
 class UserManager(BaseUserManager):
@@ -41,6 +46,12 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password, **extra_fields)
+
+    def active(self):
+        return self.get_queryset().active()
+
+    def api(self):
+        return self.get_queryset().api()
 
 
 class EnvironmentQuerySet(models.QuerySet):

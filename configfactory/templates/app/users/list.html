@@ -10,53 +10,98 @@
 {% block content %}
     <div class="box">
         <div class="box-header with-border">
-            <h3 class="box-title"></h3>
-            <div class="box-tools">
-                <a href="{% url 'create_user' %}" class="btn btn-sm btn-success pull-right">
-                    <i class="fa fa-plus"></i> {% trans 'ADD USER' %}
-                </a>
+            <h3 class="box-title">{% trans 'Filters' %}</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove">
+                    <i class="fa fa-remove"></i>
+                </button>
             </div>
         </div>
+        <form action="">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% include 'app/layouts/forms/vertical/_input.html' with field=filter.form.is_superuser %}
+                    </div>
+                    <div class="col-md-4">
+                        {% include 'app/layouts/forms/vertical/_input.html' with field=filter.form.is_apiuser %}
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-default">{% trans 'Search' %}</button>
+            </div>
+        </form>
+    </div>
+    <div class="box">
+        {% if current_user.is_superuser %}
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <a href="{% url 'create_user' %}" class="btn btn-sm btn-success pull-right">
+                        <i class="fa fa-plus"></i> {% trans 'ADD USER' %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         <div class="box-body table-responsive">
             <table class="table">
                 <thead>
                     <tr>
+                        <th>{% trans 'Username' %}</th>
                         <th>{% trans 'Email' %}</th>
                         <th>{% trans 'Full Name' %}</th>
                         <th>{% trans 'Last login' %}</th>
                         <th>{% trans 'Is staff?' %}</th>
                         <th>{% trans 'Is superadmin?' %}</th>
+                        <th>{% trans 'Is api user?' %}</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for user in object_list %}
+                {% for user in users %}
                     <tr>
+                        <td>
+                            {% if current_user.is_superuser %}
+                                <a href="{% url 'update_user' pk=user.pk %}">{{ user.username }}</a>
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
+                        </td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.get_full_name }}</td>
                         <td>{{ user.last_login|default_if_none:'' }}</td>
                         <td>{% true_false_icon user.is_staff %}</td>
                         <td>{% true_false_icon user.is_superuser %}</td>
+                        <td>{% true_false_icon user.is_apiuser %}</td>
                         <td>
                             <div class="btn-group btn-group-sm pull-right">
-                                <a href="{% url 'update_user_permissions' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Permissions' %}">
-                                    <i class="fa fa-lock"></i>
-                                </a>
-                                <a href="{% url 'set_user_password' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Set/change password' %}">
-                                    <i class="fa fa-hashtag"></i>
-                                </a>
-                                <a href="{% url 'update_user' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Edit' %}">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                                <a href="{% url 'delete_user' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Delete' %}">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                {% if current_user.is_superuser %}
+                                    <a href="{% url 'update_user_permissions' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Permissions' %}">
+                                        <i class="fa fa-lock"></i>
+                                    </a>
+                                    <a href="{% url 'change_user_password' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Set/change password' %}">
+                                        <i class="fa fa-hashtag"></i>
+                                    </a>
+                                    <a href="{% url 'update_user_api_settings' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'API settings' %}">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="{% url 'update_user' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Edit' %}">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'delete_user' pk=user.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Delete' %}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan=5">
+                        <td colspan="8">
                             <p class="text-center">{% trans 'No users found.' %}</p>
                         </td>
                     </tr>

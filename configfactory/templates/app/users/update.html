@@ -1,32 +1,33 @@
-{% extends 'app/layouts/main.html' %}
+{% extends 'app/users/layouts/users.html' %}
 {% load form_tags i18n ui_tags %}
 
-{% block title %}{% trans 'Edit' %} <strong>{{ object }}</strong>{% endblock %}
+{% block title %}{% trans 'Edit' %} <strong>{{ user }}</strong>{% endblock %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'users' %}">{% trans 'Users' %}</a></li>
-    <li class="active">{{ object }}</li>
+    <li class="active">{{ user }}</li>
 {% endblock %}
 
 {% block content %}
-    <div class="box box-primary">
-        <form role="form" class="form-horizontal" method="post">
-            {% csrf_token %}
-            <div class="box-body">
-                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.email %}
-                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.first_name %}
-                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.last_name %}
-                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_staff %}
-                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_superuser %}
-            </div>
-            <div class="box-footer">
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-6">
-                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
-                        {% back_btn request 'users' %}
-                    </div>
+    <form role="form" class="form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="box-body">
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.username %}
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.email %}
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.first_name %}
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.last_name %}
+            {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_active %}
+            {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_staff %}
+            {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_superuser %}
+            {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_apiuser %}
+        </div>
+        <div class="box-footer">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-6">
+                    <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                    {% back_btn request 'users' %}
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 {% endblock %}

@@ -11,12 +11,17 @@
     <form role="form" class="form-horizontal" method="post">
         {% csrf_token %}
         <div class="box-body">
-            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.token span_class='fa fa-key' %}
+            {% if current_user.is_superuser %}
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.api_user %}
+            {% endif %}
+            {% include 'app/layouts/forms/horizontal/_input.html' with field=form.api_token span_class='fa fa-key' %}
         </div>
         <div class="box-footer">
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-6">
-                    <button type="submit" class="btn btn-primary">{% trans 'Change token' %}</button>
+                    {% if current_user.is_apiuser %}
+                        <button type="submit" class="btn btn-primary">{% trans 'Save changes' %}</button>
+                    {% endif %}
                     <a href="{{ api_url }}" target="_blank" class="btn btn-default">
                         <i class="fa fa-globe"></i>
                         {% trans 'Goto API' %}

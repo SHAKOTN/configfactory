@@ -97,7 +97,7 @@ class LogEntry(models.Model):
         if self.action == constants.ACTION_CREATE:
             if self.user_id and self.object_id and self.content_type_id:
                 return _('%(user)s created %(object)s %(content_type)s.') % {
-                    'user': self.user.get_full_name(),
+                    'user': self.user,
                     'object': self.object_repr,
                     'content_type': self.content_type
                 }
@@ -111,7 +111,7 @@ class LogEntry(models.Model):
         elif self.action == constants.ACTION_UPDATE:
             if self.user_id and self.object_id and self.content_type_id:
                 return _('%(user)s updated %(object)s %(content_type)s.') % {
-                    'user': self.user.get_full_name(),
+                    'user': self.user,
                     'object': self.object_repr,
                     'content_type': self.content_type
                 }
@@ -125,7 +125,7 @@ class LogEntry(models.Model):
         elif self.action == constants.ACTION_DELETE:
             if self.user_id and self.object_repr and self.content_type_id:
                 return _('%(user)s deleted %(object)s %(content_type)s.') % {
-                    'user': self.user.get_full_name(),
+                    'user': self.user,
                     'object': self.object_repr,
                     'content_type': self.content_type
                 }

@@ -10,6 +10,12 @@ from configfactory.models import (
 )
 
 
+class UserFilterSet(FilterSet):
+    class Meta:
+        model = User
+        fields = ['is_superuser', 'is_apiuser']
+
+
 class LogEntryFilterSet(FilterSet):
 
     content_type = filters.ModelChoiceFilter(

@@ -1,11 +1,11 @@
 {% extends 'app/layouts/main.html' %}
 {% load i18n ui_tags %}
 
-{% block title %}{% trans 'Delete' %} <strong>{{ object }}</strong>{% endblock %}
+{% block title %}{% trans 'Delete' %} <strong>{{ user }}</strong>{% endblock %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'users' %}">{% trans 'Users' %}</a></li>
-    <li><a href="{% url 'update_user' pk=object.pk %}">{{ object }}</a></li>
+    <li><a href="{% url 'update_user' pk=user.pk %}">{{ user }}</a></li>
     <li class="active">{% trans 'Delete' %}</li>
 {% endblock %}
 
@@ -14,7 +14,7 @@
         <form method="post">
             {% csrf_token %}
             <div class="box-body">
-                {% blocktrans with name=object %}
+                {% blocktrans with name=user %}
                     <p>Are you sure you want to delete <strong>{{ name }}</strong> ?</p>
                 {% endblocktrans %}
             </div>

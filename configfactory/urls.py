@@ -116,9 +116,9 @@ urlpatterns = [
         view=views.users.UsersCreateView.as_view(),
         name='create_user'),
 
-    url(r'^users/(?P<pk>[0-9]+)/set_password/$',
-        view=views.users.UsersSetPassword.as_view(),
-        name='set_user_password'),
+    url(r'^users/(?P<pk>[0-9]+)/change_password/$',
+        view=views.users.UsersChangePassword.as_view(),
+        name='change_user_password'),
 
     url(r'^users/(?P<pk>[0-9]+)/update/$',
         view=views.users.UsersUpdateView.as_view(),
@@ -131,6 +131,10 @@ urlpatterns = [
     url(r'^users/(?P<pk>[0-9]+)/update_permissions/(?P<model>\w+)/$',
         view=views.users.UsersUpdatePermissionsView.as_view(),
         name='update_user_permissions_by_model'),
+
+    url(r'^users/(?P<pk>[0-9]+)/update_api_settings/$',
+        view=views.users.UsersUpdateAPISettingsView.as_view(),
+        name='update_user_api_settings'),
 
     url(r'^users/(?P<pk>[0-9]+)/delete/$',
         view=views.users.UsersDeleteView.as_view(),

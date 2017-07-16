@@ -23,7 +23,7 @@
         <form action="">
             <div class="box-body">
                 <div class="row">
-                    {% if user.is_superuser %}
+                    {% if current_user.is_superuser %}
                         <div class="col-md-4">
                             {% include 'app/layouts/forms/vertical/_input.html' with field=filter.form.user %}
                         </div>

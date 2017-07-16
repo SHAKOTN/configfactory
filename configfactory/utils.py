@@ -30,8 +30,7 @@ def merge_dict(d1, d2):
     ret = copy.deepcopy(d1)
 
     for k, v in d2.items():
-        if k in ret \
-                and isinstance(ret[k], dict):
+        if k in ret and isinstance(ret[k], dict):
             ret[k] = merge_dict(ret[k], v)
         else:
             ret[k] = copy.deepcopy(v)
@@ -191,7 +190,7 @@ def model_to_dict(instance: Model, fields=None, exclude=None):
 class GlobalSettingsHandler:
     """Global settings handler."""
 
-    cache_prefix = 'globals'
+    cache_prefix = 'global_settings'
 
     def __init__(self):
         self.defaults = GLOBAL_SETTINGS_DEFAULTS

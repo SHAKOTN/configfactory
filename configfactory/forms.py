@@ -2,8 +2,12 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from configfactory.exceptions import ConfigUpdateError, JSONEncodeError
-from configfactory.models import Config, ApiToken
-from configfactory.services import update_config, generate_api_token
+from configfactory.models import Config, User
+from configfactory.services import (
+    generate_api_token,
+    get_api_token,
+    update_config,
+)
 from configfactory.utils import json_loads
 
 
@@ -47,17 +51,35 @@ class JSONSchemaForm(forms.Form):
         return schema_json
 
 
-class ApiTokenForm(forms.ModelForm):
+class UserAPIForm(forms.ModelForm):
 
     class Meta:
-        model = ApiToken
-        fields = ('token',)
+        model = User
+        fields = ('api_token', 'api_user',)
         widgets = {
-            'token': forms.TextInput(attrs={
+            'api_token': forms.TextInput(attrs={
                 'readonly': True
-            })
+            }),
         }
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['api_user'].queryset = User.objects.api()
+        user = kwargs.get('instance')
+        if user:
+            api_token = get_api_token(user)
+            self.initial['api_token'] = api_token
+
+    def clean(self):
+        self._validate_unique = False
+        return self.cleaned_data
+
     def save(self, commit=True):
-        self.instance.token = generate_api_token()
-        return super().save(commit=commit)
+        user = super().save(commit=False)
+        if user.is_apiuser:
+            user.api_token = generate_api_token()
+        else:
+            user.api_token = None
+        if commit:
+            user.save()
+        return user

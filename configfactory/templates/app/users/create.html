@@ -1,10 +1,13 @@
 {% extends 'app/layouts/main.html' %}
 {% load i18n ui_tags %}
 
-{% block title %}{% trans 'Users' %}{% endblock %}
+{% block title %}{% trans 'Create users' %}{% endblock %}
 
 {% block breadcrumbs %}
-    <li class="active">{% trans 'Users' %}</li>
+    <li>
+        <a href="{% url 'users' %}">{% trans 'Users' %}</a>
+    </li>
+    <li class="active">{% trans 'Create' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -12,11 +15,14 @@
         <form role="form" class="form-horizontal" method="post">
             {% csrf_token %}
             <div class="box-body">
+                {% include 'app/layouts/forms/horizontal/_input.html' with field=form.username %}
                 {% include 'app/layouts/forms/horizontal/_input.html' with field=form.email %}
                 {% include 'app/layouts/forms/horizontal/_input.html' with field=form.first_name %}
                 {% include 'app/layouts/forms/horizontal/_input.html' with field=form.last_name %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_active %}
                 {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_staff %}
                 {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_superuser %}
+                {% include 'app/layouts/forms/horizontal/_checkbox.html' with field=form.is_apiuser %}
             </div>
             <div class="box-footer">
                 <div class="form-group">

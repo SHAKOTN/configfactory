@@ -6,12 +6,15 @@ from django.http import Http404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
+from django_filters.views import FilterView
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import assign_perm, get_objects_for_user, remove_perm
 
-from configfactory.decorators import staff_member_required
+from configfactory.decorators import staff_member_required, superuser_required
+from configfactory.filters import UserFilterSet
+from configfactory.forms import UserAPIForm
 from configfactory.models import Environment, User
 from configfactory.services import (
     log_create_object,
@@ -25,11 +28,15 @@ from configfactory.utils import model_to_dict
     login_required,
     staff_member_required
 ], name='dispatch')
-class UsersListView(ListView):
+class UsersListView(FilterView):
 
     template_name = 'app/users/list.html'
 
     paginate_by = 25
+
+    filterset_class = UserFilterSet
+
+    context_object_name = 'users'
 
     def get_queryset(self):
         return User.objects.exclude(
@@ -39,7 +46,7 @@ class UsersListView(ListView):
 
 @method_decorator([
     login_required,
-    staff_member_required
+    superuser_required
 ], name='dispatch')
 class UsersCreateView(CreateView):
 
@@ -47,7 +54,18 @@ class UsersCreateView(CreateView):
 
     queryset = User.objects.all()
 
-    fields = ('email', 'first_name', 'last_name', 'is_staff', 'is_superuser')
+    fields = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'is_active',
+        'is_staff',
+        'is_superuser',
+        'is_apiuser',
+    )
+
+    context_object_name = 'user'
 
     success_url = reverse_lazy('users')
 
@@ -73,7 +91,7 @@ class UsersCreateView(CreateView):
 
 @method_decorator([
     login_required,
-    staff_member_required
+    superuser_required
 ], name='dispatch')
 class UsersUpdateView(UpdateView):
 
@@ -81,9 +99,20 @@ class UsersUpdateView(UpdateView):
 
     queryset = User.objects.all()
 
-    fields = ('email', 'first_name', 'last_name', 'is_staff', 'is_superuser')
+    fields = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'is_active',
+        'is_staff',
+        'is_superuser',
+        'is_apiuser',
+    )
 
-    success_url = reverse_lazy('users')
+    context_object_name = 'user'
+
+    success_url = '.'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -119,17 +148,19 @@ class UsersUpdateView(UpdateView):
 
 @method_decorator([
     login_required,
-    staff_member_required
+    superuser_required
 ], name='dispatch')
-class UsersSetPassword(UpdateView):
+class UsersChangePassword(UpdateView):
 
-    template_name = 'app/users/set_password.html'
+    template_name = 'app/users/change_password.html'
 
     queryset = User.objects.all()
 
-    success_url = reverse_lazy('users')
+    context_object_name = 'user'
 
     form_class = SetPasswordForm
+
+    success_url = '.'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -158,13 +189,15 @@ class UsersSetPassword(UpdateView):
 
 @method_decorator([
     login_required,
-    staff_member_required
+    superuser_required
 ], name='dispatch')
 class UsersDeleteView(DeleteView):
 
     template_name = 'app/users/delete.html'
 
     queryset = User.objects.all()
+
+    context_object_name = 'user'
 
     success_url = reverse_lazy('users')
 
@@ -189,11 +222,15 @@ class UsersDeleteView(DeleteView):
 
 @method_decorator([
     login_required,
-    staff_member_required
+    superuser_required
 ], name='dispatch')
 class UsersUpdatePermissionsView(DetailView):
 
     template_name = 'app/users/update_permissions.html'
+
+    context_object_name = 'user'
+
+    success_url = '.'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -310,7 +347,8 @@ class UsersUpdatePermissionsView(DetailView):
         return self.render_to_response(context)
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        user = self.request.user
+        if user.is_staff and not user.is_superuser:
             return User.objects.exclude(is_superuser=True)
         return User.objects.all()
 
@@ -337,3 +375,41 @@ class UsersUpdatePermissionsView(DetailView):
         object_id = int(object_id)
         obj = self._object_cache[object_id]
         return perm, obj
+
+
+@method_decorator([
+    login_required,
+    superuser_required
+], name='dispatch')
+class UsersUpdateAPISettingsView(UpdateView):
+
+    template_name = 'app/users/update_api_settings.html'
+
+    form_class = UserAPIForm
+
+    context_object_name = 'user'
+
+    success_url = '.'
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff and not user.is_superuser:
+            return User.objects.exclude(is_superuser=True)
+        return User.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.object  # type: User
+        context['has_users'] = user.is_apiuser and user.users.exists()
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if form.has_changed():
+            messages.success(
+                self.request,
+                _('%(name)s user API settings was successfully updated.') % {
+                    'name': self.object,
+                }
+            )
+        return response
