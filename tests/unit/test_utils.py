@@ -2,9 +2,9 @@ from collections import OrderedDict
 
 from django.test import TestCase
 
+from configfactory.exceptions import CircularInjectError
 from configfactory.models import GlobalSettings
 from configfactory.utils import (
-    CircularInjectError,
     cleanse_dict,
     cleanse_value,
     global_settings,
@@ -86,7 +86,7 @@ class UtilsTestCase(TestCase):
 
         self.assertDictEqual(
             cleanse_dict(
-                d={
+                {
                     'password': '123123',
                     'private': {
                         'param1': '111',
@@ -148,8 +148,10 @@ class UtilsTestCase(TestCase):
 
     def test_inject_params(self):
 
-        content = "a.b.c = ${param:a.b.c}, b.c = ${param:b.c}, " \
-                  "c.d.e = ${param:c.d.e}"
+        content = (
+            "a.b.c = ${param:a.b.c}, b.c = ${param:b.c}, "
+            "c.d.e = ${param:c.d.e}"
+        )
 
         self.assertEqual(
             inject_params(content, params={
@@ -163,8 +165,10 @@ class UtilsTestCase(TestCase):
 
     def test_inject_params_to_self_component(self):
 
-        content = "db.host = ${param:db.host}, " \
-                  "db.default.host = ${param:db.host}"
+        content = (
+            "db.host = ${param:db.host}, "
+            "db.default.host = ${param:db.host}"
+        )
 
         self.assertEqual(
             inject_params(content, params={
@@ -176,8 +180,10 @@ class UtilsTestCase(TestCase):
 
     def test_inject_params_to_each_other(self):
 
-        content = "a.a = ${param:a.a}, a.b = ${param:a.b}, " \
-                  "b.a = ${param:b.a}, b.b = ${param:b.b}"
+        content = (
+            "a.a = ${param:a.a}, a.b = ${param:a.b}, "
+            "b.a = ${param:b.a}, b.b = ${param:b.b}"
+        )
 
         self.assertEqual(
             inject_params(content, params={

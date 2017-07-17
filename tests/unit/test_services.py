@@ -107,8 +107,8 @@ class ServicesTestCase(TestCase):
     def test_generate_api_token(self):
 
         user = UserFactory()
-        user.api_token.token = 'aaa'
-        user.api_token.save()
+        user.api_token = 'aaa'
+        user.save()
 
         with mock.patch(
             'django.utils.crypto.get_random_string',
