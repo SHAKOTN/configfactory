@@ -9,6 +9,7 @@ dump.rdb
 *.egg-info
 build/
 dist/
+node_modules/
 *.log*
 *.sqlite3
 configfactory.ini
