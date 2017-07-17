@@ -194,9 +194,9 @@ def update_config(config: Config,
     component = config.component
 
     if component.use_schema:
-        json_schema, created = JSONSchema\
-            .objects\
-            .get_or_create(component=component)
+        json_schema, created = JSONSchema.objects.get_or_create(
+            component=component
+        )
 
         try:
             jsonschema.validate(
@@ -322,8 +322,7 @@ def remove_component_star(user: User, component: Component) -> bool:
         star.delete()
         return True
     except UserComponentStar.DoesNotExist:
-        pass
-    return False
+        return False
 
 
 def log_action(action: str,

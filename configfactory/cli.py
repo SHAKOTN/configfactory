@@ -1,7 +1,7 @@
-import functools
 import os
 import shutil
 
+import appdirs
 import click
 import django
 from dj_static import Cling
@@ -17,76 +17,38 @@ from configfactory.server import ServerApplication
     '--config', '-c',
     required=False,
     envvar='CONFIGFACTORY_CONFIG',
-    type=click.Path(exists=True),
+    type=click.Path(),
+    default=appdirs.user_config_dir('configfactory.ini')
 )
-@click.pass_context
-def cli(ctx, config):
+def cli(config):
 
-    subcommand = ctx.command.commands[ctx.invoked_subcommand]
-    context_settings = subcommand.context_settings
+    if not os.path.exists(config):
 
-    if context_settings.get('obj', {}).get('django_setup'):
-
-        if config is None:
-            raise click.MissingParameter(
-                param_type='option',
-                param_hint='"--config".'
-            )
-
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'configfactory.settings'
-        os.environ['CONFIGFACTORY_CONFIG'] = config
-
-        django.setup()
-
-
-command = cli.command
-app_command = functools.partial(
-    cli.command,
-    context_settings={
-        'obj': {
-            'django_setup': True
-        }
-    }
-)
-
-
-@command()
-@click.argument(
-    'f',
-    type=click.Path(exists=True)
-)
-def init(f):
-    """Initialize ConfigFactory configuration."""
-
-    dst = os.path.join(
-        f, 'configfactory.ini'
-    )
-
-    if os.path.exists(dst):
         if not click.confirm(
-                '`{}` already exists. '
-                'Are you sure you want to override it?'.format(
-                    dst
-                )
+            '`{}` configuration file does not exist. '
+            'Do want to create it with default settings ?'.format(config)
         ):
             return
 
-    shutil.copyfile(
-        paths.DEFAULT_CONFIG,
-        dst
-    )
+        shutil.copyfile(paths.DEFAULT_CONFIG, config)
 
-    click.echo(
-        'ConfigFactory settings file saved to: {}'.format(dst)
-    )
+        click.echo(
+            'ConfigFactory settings file saved to: {}'.format(config)
+        )
 
-    click.echo(
-        'Please, edit settings file and '
-        'run `configfactory migrate` command.'
-    )
+        click.echo(
+            'Please, edit settings file and '
+            'run `configfactory migrate` command.'
+        )
+
+    os.environ['CONFIGFACTORY_CONFIG'] = config
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'configfactory.settings'
+
+    # Setup Django
+    django.setup()
 
 
-@app_command()
+@cli.command()
 @click.option(
     '--host', '-h',
     help='TCP/IP host to serve on (default: 127.0.0.1).',
@@ -127,17 +89,19 @@ def run(host, port, workers):
     server.run()
 
 
-@app_command()
+@cli.command()
 def create_superuser():
-    """Create super user."""
-
+    """
+    Create super user.
+    """
     call_command('createsuperuser')
 
 
-@app_command()
+@cli.command()
 def migrate():
-    """Migrate ConfigFactory database."""
-
+    """
+    Migrate ConfigFactory database.
+    """
     call_command('migrate')
 
 
