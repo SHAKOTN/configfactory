@@ -18,6 +18,10 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+ROOT_URLCONF = 'configfactory.urls'
+
+WSGI_APPLICATION = 'configfactory.wsgi.application'
+
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +47,6 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'configfactory.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -63,8 +65,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'configfactory.wsgi.application'
-
+######################################
+# Database settings
+######################################
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(
@@ -78,6 +81,9 @@ DATABASES = {
     }
 }
 
+######################################
+# Auth settings
+######################################
 AUTH_USER_MODEL = 'configfactory.User'
 
 AUTHENTICATION_BACKENDS = (
@@ -106,6 +112,9 @@ LOGIN_URL = 'login'
 
 LOGIN_REDIRECT_URL = 'dashboard'
 
+######################################
+# I18n/i10n settings
+######################################
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -116,12 +125,18 @@ USE_L10N = True
 
 USE_TZ = True
 
+######################################
+# Static and media settings
+######################################
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(
     paths.APP_DIR, 'static'
 )
 
+######################################
+# Cache settings
+######################################
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -129,6 +144,9 @@ CACHES = {
     }
 }
 
+######################################
+# Logging settings
+######################################
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -173,7 +191,9 @@ LOGGING = {
     }
 }
 
-
+######################################
+# ConfigFactory settings
+######################################
 GLOBAL_SETTINGS_DEFAULTS = {
     'indent': 4,
     'cleansed_hidden': 'api token key secret pass signature',
@@ -181,6 +201,9 @@ GLOBAL_SETTINGS_DEFAULTS = {
     'inject_validation': True,
 }
 
+######################################
+# Rest API settings
+######################################
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
