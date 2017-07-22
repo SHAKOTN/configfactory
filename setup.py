@@ -49,7 +49,6 @@ setup(
     extras_require={
         'tests': requires + [
             'pytest',
-            'pytest-env',
             'pytest-django',
         ],
     },
