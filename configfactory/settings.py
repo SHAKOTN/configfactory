@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'debug_toolbar',
+    'pipeline',
 
     'configfactory'
 ]
@@ -133,6 +134,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(
     paths.APP_DIR, 'static'
 )
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 ######################################
 # Cache settings
