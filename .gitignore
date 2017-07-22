@@ -12,4 +12,4 @@ dump.rdb
 /node_modules/
 *.log*
 *.sqlite3
-configfactory.ini
+/configfactory.ini
