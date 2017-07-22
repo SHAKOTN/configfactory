@@ -63,10 +63,8 @@ class EnvironmentSettingsAPIView(APIView):
         return Response(data)
 
     def get_flatten(self, request):
+        flatten = request.query_params.get('flatten')
         try:
-            return (
-                NullBooleanField()
-                .to_internal_value(request.query_params.get('flatten'))
-            )
+            return NullBooleanField().to_internal_value(flatten)
         except ValidationError:
             return False
