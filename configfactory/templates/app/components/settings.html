@@ -3,9 +3,9 @@
 
 {% block page_js %}
     {{ block.super }}
-    <script src="{% static 'vendor/ace/ace.js' %}"></script>
-    <script src="{% static 'vendor/ace/theme-tomorrow_night.js' %}"></script>
-    <script src="{% static 'vendor/ace/mode-json.js' %}"></script>
+    <script src="{% static 'ace-builds/src-min/ace.js' %}"></script>
+    <script src="{% static 'ace-builds/src-min/theme-tomorrow_night.js' %}"></script>
+    <script src="{% static 'ace-builds/src-min/mode-json.js' %}"></script>
     <script src="{% static 'vendor/jquery-ace/jquery-ace.min.js' %}"></script>
     <script>
         var $editor = $('#id_settings_json').ace({
