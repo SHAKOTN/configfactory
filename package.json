@@ -19,11 +19,12 @@
     "url": "https://github.com/antonrh/configfactory/issues"
   },
   "homepage": "https://github.com/antonrh/configfactory#readme",
-  "devDependencies": {
-    "webpack": "^3.2.0",
-    "webpack-bundle-tracker": "^0.2.0"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "admin-lte": "^2.3.11"
+    "ace-builds": "^1.2.8",
+    "admin-lte": "^2.3.11",
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.2.1"
   }
 }

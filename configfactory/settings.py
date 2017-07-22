@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'debug_toolbar',
-    'pipeline',
+    'compressor',
 
     'configfactory'
 ]
@@ -74,7 +74,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.{}'.format(
             config.get('database', 'engine', fallback='sqlite3')
         ),
-        'NAME': config.get('database', 'name'),
+        'NAME': config.get('database', 'name', fallback=':memory:'),
         'USER': config.get('database', 'user', fallback=None),
         'PASSWORD': config.get('database', 'password', fallback=None),
         'HOST': config.get('database', 'host', fallback=None),
@@ -131,11 +131,23 @@ USE_TZ = True
 ######################################
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(
-    paths.APP_DIR, 'static'
+STATIC_ROOT = os.path.join(paths.APP_DIR, 'static')
+
+STATICFILES_DIRS = [
+    os.path.join(paths.BASE_DIR, 'node_modules'),
+]
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 )
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+COMPRESS_ENABLED = True
+
+COMPRESS_OFFLINE = True
+
+COMPRESS_OUTPUT_DIR = 'dist'
 
 ######################################
 # Cache settings
