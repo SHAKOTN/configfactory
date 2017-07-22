@@ -1,4 +1,6 @@
 import os
+import warnings
+
 from configparser import (
     ConfigParser as BaseConfigParser,
     ExtendedInterpolation,
@@ -14,9 +16,14 @@ class ConfigParser(BaseConfigParser):
         )
 
     def setup(self):
-        self.read(
-            filenames=os.environ.get('CONFIGFACTORY_CONFIG')
-        )
+        config_filename = os.environ.get('CONFIGFACTORY_CONFIG')
+        if config_filename is None:
+            warnings.warn(
+                "Configuration environment variable (CONFIGFACTORY_CONFIG)"
+                " is not set. Using default settings."
+            )
+            return
+        self.read(config_filename)
 
 
 config = ConfigParser()
