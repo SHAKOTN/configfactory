@@ -13,7 +13,7 @@ requires = [
     'django-filter==1.0.4',
     'django-guardian==1.4.9',
     'django-debug-toolbar==1.8',
-    'django-pipeline==1.6.13',
+    'django-compressor==2.1.1',
     'django-webpack-loader==0.5.0',
     'djangorestframework==3.6.3',
     'dj-static==0.0.6',
