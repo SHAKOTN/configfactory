@@ -1,3 +1,69 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic');
+
+.content-wrapper,
+.right-side,
+.main-footer {
+    margin-left: 286px;
+}
+
+@media (max-width: 767px) {
+    .sidebar-open .content-wrapper,
+    .sidebar-open .right-side,
+    .sidebar-open .main-footer {
+        -webkit-transform: translate(286px, 0);
+        -ms-transform: translate(286px, 0);
+        -o-transform: translate(286px, 0);
+        transform: translate(286px, 0);
+    }
+}
+
+.main-header .navbar {
+    margin-left: 286px;
+}
+
+.main-header .logo {
+    width: 286px;
+}
+
+.main-sidebar,
+.left-side {
+    width: 286px;
+}
+
+@media (max-width: 767px) {
+    .main-sidebar,
+    .left-side {
+        -webkit-transform: translate(-286px, 0);
+        -ms-transform: translate(-286px, 0);
+        -o-transform: translate(-286px, 0);
+        transform: translate(-286px, 0);
+    }
+}
+
+@media (min-width: 768px) {
+    .sidebar-collapse .main-sidebar,
+    .sidebar-collapse .left-side {
+        -webkit-transform: translate(-286px, 0);
+        -ms-transform: translate(-286px, 0);
+        -o-transform: translate(-286px, 0);
+        transform: translate(-286px, 0);
+    }
+}
+
+.control-sidebar-bg,
+.control-sidebar {
+    right: -286px;
+    width: 286px;
+}
+
+@media (min-width: 768px) {
+    .control-sidebar-open .content-wrapper,
+    .control-sidebar-open .right-side,
+    .control-sidebar-open .main-footer {
+        margin-right: 286px;
+    }
+}
+
 .btn-add-component {
     color: white !important;
 }
