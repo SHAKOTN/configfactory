@@ -13,3 +13,4 @@ jobs:
         with:
           project: dev-multisig
           column: Requested
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
