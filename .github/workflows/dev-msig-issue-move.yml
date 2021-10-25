@@ -1,8 +1,7 @@
 name: Move Dev Issue to board
 on:
   issues:
-    types:
-      - labeled
+    types: [labeled]
 
 jobs:
   move-issue:
